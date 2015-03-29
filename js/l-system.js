@@ -1,11 +1,12 @@
 
 
-var Lsystem = function(axiom, numDerivations){
+var Lsystem = function(axiom, numDerivations, angle){
 
-    this.axiom = axiom;
-    this.numDerivations = numDerivations;
+    this.axiom = axiom; //starting string
+    this.numDerivations = numDerivations;  //how many times to run production rules on string.
     this.productions = [];
     this.generatedString = "";
+    this.angle = angle; //the angle to turn when rendering
 
 
     var ProductionRule = function(predecessor, successor, likelihood){
