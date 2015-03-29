@@ -46,8 +46,10 @@ var TurtleInstructor = function(turtle, lsystem){
 
     	var nextChar = '';
 		
+		lsystem.generate();
+
 		var paths = [];
-		//paths.push(move());
+		paths.push(moveTurtle());
 			
 		for (var i = 0; i < lsystem.generatedString.length; i++){
 			
@@ -65,6 +67,9 @@ var TurtleInstructor = function(turtle, lsystem){
 				turtle.turn(lsystem.angle);
 				break;
 			case '-':
+				turtle.turn(-(lsystem.angle));
+				break;
+			case '−':
 				turtle.turn(-(lsystem.angle));
 				break;
 			case '[':
