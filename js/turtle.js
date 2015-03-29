@@ -8,7 +8,7 @@ var Turtle = function(startX, startY, startingAngle, stepLength){
 
 	var stepLength = stepLength;
 	var positionStack = [];
-	
+    
 	//turn the turtle in 2D space
 	this.turn = function(angle){
 
