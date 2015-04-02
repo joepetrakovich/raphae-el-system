@@ -29,17 +29,28 @@ var RaphaeElSystem = function(){
 	}
 
 
+	function animateAsync(paper, turtlePath){
+
+		
+	}
 
 	function animate(paper, turtlePath){
 
-		animateSegment(paper, turtlePath, 0);
+		animateSegment(paper, turtlePath, 0, 10);
 	}
 
-	function animateSegment(paper, turtlePath, i){
+	function animateSegment(paper, turtlePath, i, speed){
 
 		var currentSegment = turtlePath[i];
 
 		if (currentSegment == undefined){
+			return;
+		}
+
+		//animate the branch and continue current branch at same time.
+		if (currentSegment.isBranch){
+			animateSegment(paper, currentSegment.branch, 0, speed);
+			animateSegment(paper, turtlePath, i+1, speed);
 			return;
 		}
 
@@ -57,9 +68,9 @@ var RaphaeElSystem = function(){
 
 		var lineStart = paper.path(start);
 
-		lineStart.animate( {path : (start + end)}, 500, 
+		lineStart.animate( {path : (start + end)}, speed, 
 			function(){
-						animateSegment(paper, turtlePath, i+1); //when one segment finished, animate next.
+						animateSegment(paper, turtlePath, i+1, speed); //when one segment finished, animate next.
 					});
 
 	}
@@ -95,15 +106,13 @@ var RaphaeElSystem = function(){
 
 		var instructor = new TurtleInstructor(turtle, lsystem);
 
-		var turtlePath = instructor.generateTurtlePath();
-
 		if (anim){
 
-			animate(paper, turtlePath);
+			animate(paper, instructor.generateAsyncTurtlePath());
 
 		} else {
 
-			paper.path(generateRaphaelPathString(turtlePath));
+			paper.path( generateRaphaelPathString( instructor.generateTurtlePath() ) );
 		}
 		
 	

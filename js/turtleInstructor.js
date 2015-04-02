@@ -41,7 +41,28 @@ var TurtleInstructor = function(turtle, lsystem){
         this.endY;
 
         this.penDown; //boolean indicating whether the line should be drawn or not.
+
+        this.isBranch = false;
+        this.branch = [];
     }
+
+
+    function branchTurtle(branch){
+
+    	var path = new Path();
+
+    	path.startX = turtle.x;
+    	path.startY = turtle.y;
+
+    	path.endX = turtle.x;
+    	path.endY = turtle.y;
+
+    	path.isBranch = true;
+    	path.branch = branch;
+
+    	return path;
+    }
+    
 
     function moveTurtle(){
 
@@ -107,13 +128,116 @@ var TurtleInstructor = function(turtle, lsystem){
 			}
     }
 
-    this.addCommand = function(character, commandType){
+    function instructAsync(currentCharacter, currentBranchPath, pathStack){
 
-    	commandMap[character] = commandType;
+    	if (currentCharacter in commandMap) {
+				  
+					switch(commandMap[currentCharacter]){
+					
+						case this.CommandType.DRAWFORWARD:
+
+							currentBranchPath.push(moveTurtleWithPenDown());
+							break;
+
+						case this.CommandType.MOVEFORWARD:
+
+							currentBranchPath.push(moveTurtle());
+							break;
+
+						case this.CommandType.TURNRIGHT:
+
+							turtle.turn(lsystem.angle);
+							break;
+
+						case this.CommandType.TURNLEFT:
+
+							turtle.turn(-(lsystem.angle));
+							break;
+						
+						case this.CommandType.PUSHSTATE:
+
+							turtle.pushState();
+							pathStack.push(currentBranchPath);
+							currentBranchPath = [];
+							break;
+						
+						case this.CommandType.POPSTATE:
+
+							turtle.popState();
+							var finishedBranch = currentBranchPath;
+							currentBranchPath = pathStack.pop();
+							currentBranchPath.push( branchTurtle(finishedBranch) );
+							break;
+					}	
+
+				} else {
+				   // ignore 
+				}
     }
-
+ 
     this.generateAsyncTurtlePath = function(){
+		
+		lsystem.generate();
 
+		var pathStack = [];
+		var currentBranchPath = [];
+		var currentCharacter = '';
+		
+		currentBranchPath.push(moveTurtle());
+			
+		for (var i = 0; i < lsystem.generatedString.length; i++){
+			
+			currentCharacter = lsystem.generatedString.charAt(i);
+			
+			if (currentCharacter in commandMap) {
+				  
+					switch(commandMap[currentCharacter]){
+					
+						case this.CommandType.DRAWFORWARD:
+
+							currentBranchPath.push(moveTurtleWithPenDown());
+							break;
+
+						case this.CommandType.MOVEFORWARD:
+
+							currentBranchPath.push(moveTurtle());
+							break;
+
+						case this.CommandType.TURNRIGHT:
+
+							turtle.turn(lsystem.angle);
+							break;
+
+						case this.CommandType.TURNLEFT:
+
+							turtle.turn(-(lsystem.angle));
+							break;
+						
+						case this.CommandType.PUSHSTATE:
+
+							turtle.pushState();
+							pathStack.push(currentBranchPath);
+							currentBranchPath = [];
+							break;
+						
+						case this.CommandType.POPSTATE:
+
+							turtle.popState();
+							var finishedBranch = currentBranchPath;
+							currentBranchPath = pathStack.pop();
+							currentBranchPath.push( branchTurtle(finishedBranch) );
+							break;
+					}	
+
+				} else {
+				   // ignore 
+				}
+		}
+
+
+		return currentBranchPath;
+
+    	
     }
 
     this.generateTurtlePath = function(){
