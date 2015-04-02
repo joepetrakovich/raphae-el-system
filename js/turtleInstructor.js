@@ -69,7 +69,7 @@ var TurtleInstructor = function(turtle, lsystem){
 			case '-':
 				turtle.turn(-(lsystem.angle));
 				break;
-			case '−':
+			case '\u2212':
 				turtle.turn(-(lsystem.angle));
 				break;
 			case '[':

@@ -11,19 +11,118 @@
 		<script src="../js/turtleInstructor.js"></script>
 		<script src="../js/raphae-el-system.js"></script>
 	
-
-		
-		
+	<style>
+		#demo-container{ display:table; margin-left:auto; margin-right:auto;}
+		#canvas-container, #controls {
+			margin-left:auto;
+			margin-right:auto;
+			padding:15px;
+			float:left;
+			width:500px;
+			height:500px;
+			border:2px solid green;
+			
+		}
+	</style>
 	</head>
 
 	<body>
+	
+		<div id="demo-container">
+			
+			<div id="controls">
+					<form>
+						axiom:<br/>
+						<input id="txtAxiom" type="text" name="axiom"/>
+						<br/>
+						iterations:<br/>
+						<input id="txtIterations" type="text" name="iterations"/>
+						<br/>
+						angle:<br>
+						<input id="txtAngle" type="text" name="angle"/>
+						<br/>
+						<br/>
+						Production Rule:<br/>
+						<br/>
+						predecessor:<br/>
+						<input id="txtPred" type="text" name="pred"/>
+						<br/>
+						successor:<br/>
+						<input id="txtSucc" type="text" name="succ"/>
+						<br/>
+						line length (pixels):<br/>
+						<input id="txtLineLength" type="text" name="lineLength"/>
+						<br/>
+						<input type="button" name="btnAddRule" value="Add Rule" onclick="btnAddRuleClick()"/>
+						<input type="button" name="btnDraw" value="Draw" onclick="btnDrawClick()"/>
+						<input type="button" name="btnStartOver" value="Start Over" onclick="btnStartOverClick()"/>
+						
+			</form>
+			<p id="output"></p>
+			</div>
 		
-		<div id="canvas_container" style="
-    width: 800px;
-    height: 800px;
- 
-"></div>
+			<div id="canvas-container"></div>
+			
+		</div>
+		
+		<script>
+			var lsystem;
+			var r = new RaphaeElSystem();
 
+			var txtAxiom = document.getElementById("txtAxiom");
+			var	txtIterations = document.getElementById("txtIterations");
+			var	txtAngle = document.getElementById("txtAngle");
+			var txtPredecessor = document.getElementById("txtPred");
+			var txtSuccessor = document.getElementById("txtSucc");
+			var txtLineLength =  document.getElementById("txtLineLength");
+
+			//defaults
+			txtLineLength.value = "10";
+
+			function btnAddRuleClick(){
+
+				if (lsystem == undefined){
+
+					setLSystem();
+				}
+
+				var pred = txtPredecessor.value;
+				var succ = txtSuccessor.value;
+				
+				lsystem.addProduction(pred, succ, 1.0);
+
+				txtPredecessor.value = txtSuccessor.value = "";
+			}
+		
+			function btnDrawClick(){
+
+
+				if (lsystem == undefined){
+
+					setLSystem();
+				}
+
+				r.clear();
+
+				r.draw("canvas-container", lsystem, parseInt(txtLineLength.value));
+			}
+
+			function btnStartOverClick(){
+				txtAxiom.value = txtIterations.value = txtAngle.value = "";
+				lsystem = null;
+
+
+			}
+		
+			function setLSystem(){
+				var axiom = txtAxiom.value;
+				var n = parseInt( txtIterations.value );
+				var angle = parseFloat( txtAngle.value );
+				
+				lsystem = new Lsystem(axiom, n, angle);
+			}
+
+		</script>
 	</body>
 
 </html>

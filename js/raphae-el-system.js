@@ -3,7 +3,7 @@
 
 var RaphaeElSystem = function(){
 
-	
+	var paper;
 
 	function generateRaphaelPathString(turtlePath){
 
@@ -28,26 +28,34 @@ var RaphaeElSystem = function(){
 	}
 
 
-	this.draw = function(domSurface, lsystem){ 
+	this.draw = function(domSurface, lsystem, lineLength){ 
 
 		var domElement = document.getElementById(domSurface);
 
 		var width = domElement.offsetWidth;
 		var height = domElement.offsetHeight;
 	
-		var paper = new Raphael(domElement, width, height);
-	 	var primer = paper.rect(0,0, width-2, height-2).attr({fill:'#FFF', 'stroke-opacity':0});
+		paper = new Raphael(domElement, width, height);
+	 	//var primer = paper.rect(0,0, width-2, height-2).attr({fill:'#FFF', 'stroke-opacity':0});
 
-		var turtle = new Turtle(width/2, height/2, 90, 10); //step should be passed
+		var turtle = new Turtle(width/2, height/2, 90, lineLength); //step should be passed
 
 		var instructor = new TurtleInstructor(turtle, lsystem);
 
 		var turtlePath = instructor.generateTurtlePath();
 
-		 return generateRaphaelPathString(turtlePath);
+		paper.path(generateRaphaelPathString(turtlePath));
 		
 	
+	}
 
+	this.clear = function(){
+
+		if (paper != undefined){
+			var paperDom = paper.canvas;
+    		paperDom.parentNode.removeChild(paperDom);
+			paper.remove();
+		}
 	}
 
 }
