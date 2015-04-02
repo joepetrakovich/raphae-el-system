@@ -108,16 +108,14 @@
 					setLSystem();
 				}
 
-				r.clear();
-
-				r.draw("canvas-container", lsystem, parseInt(txtLineLength.value));
+				r.draw("canvas-container", lsystem, parseInt(txtLineLength.value), true);
 			}
 
 			function btnStartOverClick(){
 				
 				txtAxiom.value = txtIterations.value = txtAngle.value = "";
 				lsystem = null;
-				r.clear();
+			
 
 
 			}
