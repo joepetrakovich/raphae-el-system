@@ -66,28 +66,11 @@ var TurtleInstructor = function(turtle, lsystem){
     	return path;
     }
 
+    function instruct(character, paths){
 
-    this.addCommand = function(character, commandType){
-
-    	commandMap[character] = commandType;
-    }
-
-    this.generateTurtlePath = function(){
-
-    	var nextChar = '';
-		
-		lsystem.generate();
-
-		var paths = [];
-		paths.push(moveTurtle());
-			
-		for (var i = 0; i < lsystem.generatedString.length; i++){
-			
-			nextChar = lsystem.generatedString.charAt(i);
-			
-			if (nextChar in commandMap) {
+    	if (character in commandMap) {
 			  
-				switch(commandMap[nextChar]){
+				switch(commandMap[character]){
 				
 					case this.CommandType.DRAWFORWARD:
 
@@ -122,12 +105,37 @@ var TurtleInstructor = function(turtle, lsystem){
 			} else {
 			   // ignore 
 			}
+    }
 
+    this.addCommand = function(character, commandType){
+
+    	commandMap[character] = commandType;
+    }
+
+    this.generateAsyncTurtlePath = function(){
+
+    }
+
+    this.generateTurtlePath = function(){
+
+    	var nextChar = '';
+		
+		lsystem.generate();
+
+		var paths = [];
+		paths.push(moveTurtle());
 			
+		for (var i = 0; i < lsystem.generatedString.length; i++){
+			
+			nextChar = lsystem.generatedString.charAt(i);
+			
+			instruct.call(this, nextChar, paths);
 		}
+
 
 		return paths;
     }
+
 
 
 }
