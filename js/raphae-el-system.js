@@ -44,7 +44,16 @@ var RaphaeElSystem = function(){
 		}
 
 		var start = "M" + currentSegment.startX + " " + currentSegment.startY;
-		var end = "L" + currentSegment.endX + " " + currentSegment.endY;
+
+		var end;
+
+		if (currentSegment.penDown){
+			end = "L";
+		} else {
+			end = "M";
+		}
+		
+		end = end + currentSegment.endX + " " + currentSegment.endY;
 
 		var lineStart = paper.path(start);
 
