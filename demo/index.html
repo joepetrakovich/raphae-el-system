@@ -16,13 +16,17 @@
 		#canvas-container, #controls {
 			margin-left:auto;
 			margin-right:auto;
-			padding:15px;
 			float:left;
 			width:500px;
 			height:500px;
 			border:2px solid green;
 			
 		}
+
+		#controls{
+			padding-left:15px;
+		}
+
 	</style>
 	</head>
 
@@ -32,6 +36,8 @@
 			
 			<div id="controls">
 					<form>
+						<br/>
+						
 						axiom:<br/>
 						<input id="txtAxiom" type="text" name="axiom"/>
 						<br/>
@@ -108,8 +114,10 @@
 			}
 
 			function btnStartOverClick(){
+				
 				txtAxiom.value = txtIterations.value = txtAngle.value = "";
 				lsystem = null;
+				r.clear();
 
 
 			}

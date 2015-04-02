@@ -34,11 +34,12 @@ var RaphaeElSystem = function(){
 
 		var width = domElement.offsetWidth;
 		var height = domElement.offsetHeight;
+		var padding = window.getComputedStyle(domElement, null).getPropertyValue('padding');
 	
 		paper = new Raphael(domElement, width, height);
-	 	//var primer = paper.rect(0,0, width-2, height-2).attr({fill:'#FFF', 'stroke-opacity':0});
 
-		var turtle = new Turtle(width/2, height/2, 90, lineLength); //step should be passed
+		//starts in the middle bottom of paper.  use height/2 for middle of paper.
+		var turtle = new Turtle(width/2, height, 90, lineLength); //step should be passed
 
 		var instructor = new TurtleInstructor(turtle, lsystem);
 

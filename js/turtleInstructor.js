@@ -7,6 +7,30 @@ var TurtleInstructor = function(turtle, lsystem){
 	var turtle = turtle;
 	var lsystem = lsystem;
 
+	this.CommandType = {
+    	DRAWFORWARD : 0,
+    	MOVEFORWARD : 1,
+    	TURNLEFT : 2,
+    	TURNRIGHT : 3,
+    	PUSHSTATE : 4,
+    	POPSTATE : 5
+    }
+
+	var commandMap = {
+
+		'F' : this.CommandType.DRAWFORWARD,
+		'A' : this.CommandType.DRAWFORWARD,
+		'B' : this.CommandType.DRAWFORWARD,
+		'G' : this.CommandType.DRAWFORWARD,
+ 		'f' : this.CommandType.MOVEFORWARD,
+		'-' : this.CommandType.TURNLEFT,
+		'\u2212' : this.CommandType.TURNLEFT,
+		'+' : this.CommandType.TURNRIGHT,
+		'[' : this.CommandType.PUSHSTATE,
+		']' : this.CommandType.POPSTATE
+ 
+	}
+
     //Holds one step of turtle movement.
 	var Path = function(){
 
@@ -42,6 +66,12 @@ var TurtleInstructor = function(turtle, lsystem){
     	return path;
     }
 
+
+    this.addCommand = function(character, commandType){
+
+    	commandMap[character] = commandType;
+    }
+
     this.generateTurtlePath = function(){
 
     	var nextChar = '';
@@ -55,30 +85,45 @@ var TurtleInstructor = function(turtle, lsystem){
 			
 			nextChar = lsystem.generatedString.charAt(i);
 			
-			switch(nextChar){
-			
-			case 'F':
-				paths.push(moveTurtleWithPenDown());
-				break;
-			case 'f':
-				paths.push(moveTurtle());
-				break;
-			case '+':
-				turtle.turn(lsystem.angle);
-				break;
-			case '-':
-				turtle.turn(-(lsystem.angle));
-				break;
-			case '\u2212':
-				turtle.turn(-(lsystem.angle));
-				break;
-			case '[':
-				turtle.pushState();
-				break;
-			case ']':
-				turtle.popState();
-				break;
+			if (nextChar in commandMap) {
+			  
+				switch(commandMap[nextChar]){
+				
+					case this.CommandType.DRAWFORWARD:
+
+						paths.push(moveTurtleWithPenDown());
+						break;
+
+					case this.CommandType.MOVEFORWARD:
+
+						paths.push(moveTurtle());
+						break;
+
+					case this.CommandType.TURNRIGHT:
+
+						turtle.turn(lsystem.angle);
+						break;
+
+					case this.CommandType.TURNLEFT:
+						turtle.turn(-(lsystem.angle));
+						break;
+					
+					case this.CommandType.PUSHSTATE:
+
+						turtle.pushState();
+						break;
+					
+					case this.CommandType.POPSTATE:
+
+						turtle.popState();
+						break;
+				}	
+
+			} else {
+			   // ignore 
 			}
+
+			
 		}
 
 		return paths;

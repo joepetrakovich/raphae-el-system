@@ -7,7 +7,7 @@ var Lsystem = function(axiom, numDerivations, angle){
     this.productions = [];
     this.generatedString = "";
     this.angle = angle; //the angle to turn when rendering
-
+  
 
     var ProductionRule = function(predecessor, successor, likelihood){
 
