@@ -13,7 +13,8 @@ var TurtleInstructor = function(turtle, lsystem){
     	TURNLEFT : 2,
     	TURNRIGHT : 3,
     	PUSHSTATE : 4,
-    	POPSTATE : 5
+    	POPSTATE : 5,
+    	CUSTOMDRAW : 6
     }
 
 	var commandMap = {
@@ -31,6 +32,12 @@ var TurtleInstructor = function(turtle, lsystem){
  
 	}
 
+	this.addCommand = function(letter, commandType){
+
+		commandMap[letter] = commandType;
+	}
+
+
     //Holds one step of turtle movement.
 	var Path = function(){
 
@@ -44,6 +51,12 @@ var TurtleInstructor = function(turtle, lsystem){
 
         this.isBranch = false;
         this.branch = [];
+
+        this.isCustomDraw = false;
+        this.customDrawingKey; //you must provide a map in which value is a function that
+        						//draws the custom drawing using the drawing engine of your choice.
+        						//RaphaeElSystem, for example, uses RaphaelJS so the map keys will
+        						//point to functions which accept a Raphael paper and coordinates.
     }
 
 
@@ -87,6 +100,21 @@ var TurtleInstructor = function(turtle, lsystem){
     	return path;
     }
 
+    function addCustomDraw(character){
+    	var path = new Path();
+
+    	path.startX = turtle.x;
+    	path.startY = turtle.y;
+
+    	path.endX = turtle.x;
+    	path.endY = turtle.y;
+
+    	path.isCustomDraw = true;
+    	path.customDrawingKey = character;
+
+    	return path;
+    }
+
     function instruct(character, paths){
 
     	if (character in commandMap) {
@@ -121,6 +149,11 @@ var TurtleInstructor = function(turtle, lsystem){
 
 						turtle.popState();
 						break;
+					
+					case this.CommandType.CUSTOMDRAW:
+						paths.push(addCustomDraw(character));
+						break;
+
 				}	
 
 			} else {
@@ -128,52 +161,7 @@ var TurtleInstructor = function(turtle, lsystem){
 			}
     }
 
-    function instructAsync(currentCharacter, currentBranchPath, pathStack){
-
-    	if (currentCharacter in commandMap) {
-				  
-					switch(commandMap[currentCharacter]){
-					
-						case this.CommandType.DRAWFORWARD:
-
-							currentBranchPath.push(moveTurtleWithPenDown());
-							break;
-
-						case this.CommandType.MOVEFORWARD:
-
-							currentBranchPath.push(moveTurtle());
-							break;
-
-						case this.CommandType.TURNRIGHT:
-
-							turtle.turn(lsystem.angle);
-							break;
-
-						case this.CommandType.TURNLEFT:
-
-							turtle.turn(-(lsystem.angle));
-							break;
-						
-						case this.CommandType.PUSHSTATE:
-
-							turtle.pushState();
-							pathStack.push(currentBranchPath);
-							currentBranchPath = [];
-							break;
-						
-						case this.CommandType.POPSTATE:
-
-							turtle.popState();
-							var finishedBranch = currentBranchPath;
-							currentBranchPath = pathStack.pop();
-							currentBranchPath.push( branchTurtle(finishedBranch) );
-							break;
-					}	
-
-				} else {
-				   // ignore 
-				}
-    }
+    
  
     this.generateAsyncTurtlePath = function(){
 		
@@ -226,6 +214,10 @@ var TurtleInstructor = function(turtle, lsystem){
 							var finishedBranch = currentBranchPath;
 							currentBranchPath = pathStack.pop();
 							currentBranchPath.push( branchTurtle(finishedBranch) );
+							break;
+
+						case this.CommandType.CUSTOMDRAW:
+							currentBranchPath.push( addCustomDraw(currentCharacter) );
 							break;
 					}	
 
