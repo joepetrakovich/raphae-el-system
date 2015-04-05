@@ -9,16 +9,18 @@ http://en.wikipedia.org/wiki/L-system
 See the demo code for example setup.
 
 If you wanted to render the fractal plant (Example 7) on Wikipedia:
+<br/>
 
-Example 7: Fractal plant
-variables : X F
-constants : + − [ ]
-start  : X
-rules  : (X → F-[[X]+X]+F[+FX]-X), (F → FF)
-angle  : 25°
+Example 7: Fractal plant<br/>
+variables : X F<br/>
+constants : + − [ ]<br/>
+start  : X<br/>
+rules  : (X → F-[[X]+X]+F[+FX]-X), (F → FF)<br/>
+angle  : 25°<br/>
 
 You would first construct the L-system like:
 
+```javascript
 var axiom = 'X';
 var n = 6;
 var angle = 25;
@@ -26,12 +28,18 @@ var angle = 25;
 lsystem = new Lsystem(axiom, n, angle);
 lsystem.addProduction('X', 'F-[[X]+X]+F[+FX]-X', 1);
 lsystem.addProduction('F', 'FF', 1);
+```
 
-Next, create a library object instance and pass a DOM element ID
-that is large enough to hold the drawing, the lsystem, the length of line segments in pixels,
-and a boolean representing whether or not to animate the rendering.
+Next, create a library object instance and call the required methods below to setup and draw.
+Initial parameters involve specifying the drawing surface, starting point, angle, line length,
+and animation speed.
 
-var r = new RaphaeElSystem();
-r.draw("canvas-container", lsystem, 3, true); //3 is the length of line segments in px.
+```javascript
+var raphaelSystem = new RaphaeElSystem();
 
-Again, see the demo for specifics as these instructions may be out of sync.
+raphaelSystem
+    .configurePaper("canvas-container", 300, 300, 90, 10)
+    .setLSystem(lsystem)
+    .draw(true, 50);
+```
+
