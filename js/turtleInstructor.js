@@ -1,10 +1,9 @@
 
 //A class used to walk a turtle using a given Lindenmayer system.
 
-var TurtleInstructor = function(turtle, lsystem){
+var TurtleInstructor = function(startX, startY, startAngle, lineLength, lsystem){
 
-
-	var turtle = turtle;
+	var turtle = new Turtle(startX, startY, startAngle, lineLength);
 	var lsystem = lsystem;
 
 	this.CommandType = {
@@ -13,7 +12,8 @@ var TurtleInstructor = function(turtle, lsystem){
     	TURNLEFT : 2,
     	TURNRIGHT : 3,
     	PUSHSTATE : 4,
-    	POPSTATE : 5
+    	POPSTATE : 5,
+    	CUSTOM : 6
     }
 
 	var commandMap = {
@@ -44,9 +44,16 @@ var TurtleInstructor = function(turtle, lsystem){
 
         this.isBranch = false;
         this.branch = [];
+
+        this.isCustomCommand = false;
+        this.customCommandKey; 
     }
 
+	this.addCommand = function(letter, commandType){
 
+		commandMap[letter] = commandType;
+	}
+	
     function branchTurtle(branch){
 
     	var path = new Path();
@@ -63,7 +70,6 @@ var TurtleInstructor = function(turtle, lsystem){
     	return path;
     }
     
-
     function moveTurtle(){
 
     	var path = new Path();
@@ -87,94 +93,21 @@ var TurtleInstructor = function(turtle, lsystem){
     	return path;
     }
 
-    function instruct(character, paths){
+    function doCustomCommand(character){
+    	var path = new Path();
 
-    	if (character in commandMap) {
-			  
-				switch(commandMap[character]){
-				
-					case this.CommandType.DRAWFORWARD:
+    	path.startX = turtle.x;
+    	path.startY = turtle.y;
 
-						paths.push(moveTurtleWithPenDown());
-						break;
+    	path.endX = turtle.x;
+    	path.endY = turtle.y;
 
-					case this.CommandType.MOVEFORWARD:
+    	path.isCustomCommand = true;
+    	path.customCommandKey = character;
 
-						paths.push(moveTurtle());
-						break;
-
-					case this.CommandType.TURNRIGHT:
-
-						turtle.turn(lsystem.angle);
-						break;
-
-					case this.CommandType.TURNLEFT:
-						turtle.turn(-(lsystem.angle));
-						break;
-					
-					case this.CommandType.PUSHSTATE:
-
-						turtle.pushState();
-						break;
-					
-					case this.CommandType.POPSTATE:
-
-						turtle.popState();
-						break;
-				}	
-
-			} else {
-			   // ignore 
-			}
+    	return path;
     }
 
-    function instructAsync(currentCharacter, currentBranchPath, pathStack){
-
-    	if (currentCharacter in commandMap) {
-				  
-					switch(commandMap[currentCharacter]){
-					
-						case this.CommandType.DRAWFORWARD:
-
-							currentBranchPath.push(moveTurtleWithPenDown());
-							break;
-
-						case this.CommandType.MOVEFORWARD:
-
-							currentBranchPath.push(moveTurtle());
-							break;
-
-						case this.CommandType.TURNRIGHT:
-
-							turtle.turn(lsystem.angle);
-							break;
-
-						case this.CommandType.TURNLEFT:
-
-							turtle.turn(-(lsystem.angle));
-							break;
-						
-						case this.CommandType.PUSHSTATE:
-
-							turtle.pushState();
-							pathStack.push(currentBranchPath);
-							currentBranchPath = [];
-							break;
-						
-						case this.CommandType.POPSTATE:
-
-							turtle.popState();
-							var finishedBranch = currentBranchPath;
-							currentBranchPath = pathStack.pop();
-							currentBranchPath.push( branchTurtle(finishedBranch) );
-							break;
-					}	
-
-				} else {
-				   // ignore 
-				}
-    }
- 
     this.generateAsyncTurtlePath = function(){
 		
 		lsystem.generate();
@@ -227,6 +160,10 @@ var TurtleInstructor = function(turtle, lsystem){
 							currentBranchPath = pathStack.pop();
 							currentBranchPath.push( branchTurtle(finishedBranch) );
 							break;
+
+						case this.CommandType.CUSTOM:
+							currentBranchPath.push( doCustomCommand(currentCharacter) );
+							break;
 					}	
 
 				} else {
@@ -258,6 +195,52 @@ var TurtleInstructor = function(turtle, lsystem){
 
 
 		return paths;
+    }
+	
+    function instruct(character, paths){
+
+    	if (character in commandMap) {
+			  
+				switch(commandMap[character]){
+				
+					case this.CommandType.DRAWFORWARD:
+
+						paths.push(moveTurtleWithPenDown());
+						break;
+
+					case this.CommandType.MOVEFORWARD:
+
+						paths.push(moveTurtle());
+						break;
+
+					case this.CommandType.TURNRIGHT:
+
+						turtle.turn(lsystem.angle);
+						break;
+
+					case this.CommandType.TURNLEFT:
+						turtle.turn(-(lsystem.angle));
+						break;
+					
+					case this.CommandType.PUSHSTATE:
+
+						turtle.pushState();
+						break;
+					
+					case this.CommandType.POPSTATE:
+
+						turtle.popState();
+						break;
+					
+					case this.CommandType.CUSTOM:
+						paths.push(doCustomCommand(character));
+						break;
+
+				}	
+
+			} else {
+			   // ignore 
+			}
     }
 
 
