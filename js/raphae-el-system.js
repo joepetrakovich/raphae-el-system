@@ -68,7 +68,7 @@ var RaphaeElSystem = function () {
 		
 		clearPaper();
 
-		var turtleInstructor = initTurtleInstructor(startX, startY, startAngle, lineLength, lsystem);
+		var turtleInstructor = initTurtleInstructor(startX, startY, startAngle, lineLength, lSystem);
 
 		if (anim){
 
