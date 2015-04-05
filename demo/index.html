@@ -17,8 +17,8 @@
 			margin-left:auto;
 			margin-right:auto;
 			float:left;
-			width:500px;
-			height:500px;
+			width:600px;
+			height:600px;
 			border:2px solid green;
 			
 		}
@@ -38,29 +38,44 @@
 					<form>
 						<br/>
 						
-						axiom:<br/>
+						Axiom:<br/>
 						<input id="txtAxiom" type="text" name="axiom"/>
 						<br/>
-						iterations:<br/>
+						Iterations:<br/>
 						<input id="txtIterations" type="text" name="iterations"/>
 						<br/>
-						angle:<br>
+						Turn Angle:<br>
 						<input id="txtAngle" type="text" name="angle"/>
 						<br/>
 						<br/>
 						Production Rule:<br/>
 						<br/>
-						predecessor:<br/>
+						Predecessor:<br/>
 						<input id="txtPred" type="text" name="pred"/>
 						<br/>
-						successor:<br/>
+						Successor:<br/>
 						<input id="txtSucc" type="text" name="succ"/>
 						<br/>
-						line length (pixels):<br/>
+						<input type="button" name="btnAddRule" value="Add Rule" onclick="btnAddRuleClick()"/><br/><br/>
+						<br/>
+						Start X:<br/>
+						<input id="txtStartX" type="text" name="x"/>
+						<br/>
+						Start Y:<br/>
+						<input id="txtStartY" type="text" name="y"/>
+						<br/>
+						Start Angle (90 is up):<br/>
+						<input id="txtStartAngle" type="text" name="startAngle"/>
+						<br/>
+						Animate Speed (millis):<br/>
+						<input id="txtAnimateSpeed" type="text" name="txtAnimateSpeed"/>
+						<br/>
+						Line Length (pixels):<br/>
 						<input id="txtLineLength" type="text" name="lineLength"/>
 						<br/>
-						<input type="button" name="btnAddRule" value="Add Rule" onclick="btnAddRuleClick()"/>
+						<br/>
 						<input type="button" name="btnDraw" value="Draw" onclick="btnDrawClick()"/>
+						<input id="cbAnimate" type="checkbox" name="cbAnimate" value="Animate" />Animate
 						<input type="button" name="btnStartOver" value="Start Over" onclick="btnStartOverClick()"/>
 						
 			</form>
@@ -72,23 +87,38 @@
 		</div>
 		
 		<script>
-			var lsystem;
-			var r = new RaphaeElSystem();
 
+			var raphaelSystem = new RaphaeElSystem();
+			var lsystem;
+			
 			var txtAxiom = document.getElementById("txtAxiom");
 			var	txtIterations = document.getElementById("txtIterations");
 			var	txtAngle = document.getElementById("txtAngle");
 			var txtPredecessor = document.getElementById("txtPred");
 			var txtSuccessor = document.getElementById("txtSucc");
 			var txtLineLength =  document.getElementById("txtLineLength");
+			var cbAnimate = document.getElementById("cbAnimate");
+			var txtStartX = document.getElementById("txtStartX");
+			var txtStartY = document.getElementById("txtStartY");
+			var txtStartAngle = document.getElementById("txtStartAngle");
+			var txtAnimateSpeed = document.getElementById("txtAnimateSpeed");
+			
+			var lineAttr = {
+				'stroke-width':2, 
+				stroke: '#008800',
+				'stroke-linejoin': 'round'
+			}
+				
 
 			//defaults
-			txtLineLength.value = "10";
+			txtLineLength.value = 10;
+			txtStartX.value = txtStartY.value = 300;
+			txtStartAngle.value = 90;
+			txtAnimateSpeed.value = 20;
 
 			function btnAddRuleClick(){
 
 				if (lsystem == undefined){
-
 					setLSystem();
 				}
 
@@ -102,31 +132,113 @@
 		
 			function btnDrawClick(){
 
-
 				if (lsystem == undefined){
-
 					setLSystem();
 				}
-
-				r.draw("canvas-container", lsystem, parseInt(txtLineLength.value), true);
+				
+				var animate = cbAnimate.checked;
+				
+				raphaelSystem
+				.configurePaper("canvas-container", txtStartX.value, txtStartY.value, txtStartAngle.value, txtLineLength.value, lineAttr)
+				.setLSystem(lsystem)
+				.setCustomCommandMap( getCustomDrawings() )
+				.draw(animate, txtAnimateSpeed.value);
+				
 			}
 
 			function btnStartOverClick(){
 				
 				txtAxiom.value = txtIterations.value = txtAngle.value = "";
 				lsystem = null;
-			
-
-
+				raphaelSystem.clear();
+		
 			}
 		
 			function setLSystem(){
+			
 				var axiom = txtAxiom.value;
 				var n = parseInt( txtIterations.value );
 				var angle = parseFloat( txtAngle.value );
 				
 				lsystem = new Lsystem(axiom, n, angle);
 			}
+			
+			function getCustomDrawings(){
+
+				var customCommandMap = {};
+				
+				customCommandMap['b'] =  function drawBulb(paper, x, y){
+				
+					paper.circle(x, y,  0, 0).attr({opacity:0,  fill:'#008800'})
+					.animate({r:10, opacity:1}, 500, 'elastic');
+					};
+
+				customCommandMap['B'] = function drawBloom(paper, x, y){
+				
+					paper.circle(x, y, 1,1).attr({fill:'#000000'})
+					.animate({r:30/2, fill:'#00AA00', opacity:1}, 1200, function(){
+
+						this.animate({r:30,
+							fill:'#FFB90F',stroke: '#63D1F4','stroke-width':30/4}, 500,'elastic', function(){
+								drawPetals(paper, 0, 40, 30, -12, x, y);});});
+				
+					}
+					
+				return customCommandMap;
+			}
+
+			function drawPetals(paper, i, speed, numPetals, rot, x, y){
+
+				var rotate = rot;
+				var bloomRadius = 30;
+
+
+				if (i >= numPetals){
+				
+					var leftEye = paper.ellipse(x - 7, y, 0, 30/9)
+						.attr({fill:'#FFFFFF', rotation:90})
+						.animate({rx:bloomRadius/4, ry:bloomRadius/9}, 600, '>', function(){
+							
+							this.animate({rx:0}, 100, '>', function(){
+								this.animate({rx:bloomRadius/4}, 100, '>', function(){
+									
+									this.animate({rx:0}, 100, '>', function(){
+										this.animate({rx:bloomRadius/4}, 100, '>');});
+									
+								});	});
+							
+						});	
+					
+					var rightEye = paper.ellipse(x + 7, y, 0, bloomRadius/9)
+						.attr({fill:'#FFFFFF', rotation:90})
+						.animate({rx:bloomRadius/4, ry:bloomRadius/9}, 600, '>', function(){
+							
+							this.animate({rx:0}, 100, '>', function(){
+								this.animate({rx:bloomRadius/4}, 100, '>', function(){
+									
+									this.animate({rx:0}, 100, '>', function(){
+										this.animate({rx:bloomRadius/4}, 100, '>');});
+									
+								});	});
+							
+						});	
+			
+					
+					return;		
+				}
+				
+					var currentRotation = ((2 * Math.PI) / numPetals)*(i); 
+				
+					// Working in radians, where 2pi is the full rotation of the circle
+
+					var x1 = (bloomRadius+(bloomRadius/3)) * Math.cos(currentRotation); // R being the radius of the circle
+					var y1 = (bloomRadius+(bloomRadius/3)) * Math.sin(currentRotation); // R being the radius of the circle
+					rotate = rotate + 12;
+					
+					paper.ellipse(x1 + x, y1 + y, 0, 0).attr({fill:'#FFFFFF',rotation:rotate}).animate({rx:bloomRadius/3, ry:bloomRadius/8}, speed, 'bounce', function(){
+						drawPetals(paper, i+1, speed, numPetals, rotate, x,y);});
+			}
+
 
 		</script>
 	</body>
