@@ -196,7 +196,7 @@
 				if (i >= numPetals){
 				
 					var leftEye = paper.ellipse(x - 7, y, 0, 30/9)
-						.attr({fill:'#FFFFFF', rotation:90})
+						.attr({fill:'#FFFFFF', transform:'r90'})
 						.animate({rx:bloomRadius/4, ry:bloomRadius/9}, 600, '>', function(){
 							
 							this.animate({rx:0}, 100, '>', function(){
@@ -210,7 +210,7 @@
 						});	
 					
 					var rightEye = paper.ellipse(x + 7, y, 0, bloomRadius/9)
-						.attr({fill:'#FFFFFF', rotation:90})
+						.attr({fill:'#FFFFFF', transform:'r90'})
 						.animate({rx:bloomRadius/4, ry:bloomRadius/9}, 600, '>', function(){
 							
 							this.animate({rx:0}, 100, '>', function(){
@@ -235,7 +235,7 @@
 					var y1 = (bloomRadius+(bloomRadius/3)) * Math.sin(currentRotation); // R being the radius of the circle
 					rotate = rotate + 12;
 					
-					paper.ellipse(x1 + x, y1 + y, 0, 0).attr({fill:'#FFFFFF',rotation:rotate}).animate({rx:bloomRadius/3, ry:bloomRadius/8}, speed, 'bounce', function(){
+					paper.ellipse(x1 + x, y1 + y, 0, 0).attr({fill:'#FFFFFF', transform:'r'+rotate}).animate({rx:bloomRadius/3, ry:bloomRadius/8}, speed, 'bounce', function(){
 						drawPetals(paper, i+1, speed, numPetals, rotate, x,y);});
 			}
 
