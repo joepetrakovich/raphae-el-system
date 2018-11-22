@@ -8,7 +8,7 @@ http://en.wikipedia.org/wiki/L-system
 
 See the demo code for example setup.
 
-Play with an [old live demo here](https://ptrkv.ch/things/raphae-el-system-demo/). (Desktop only).
+Play with an [old live demo here](https://joe.ptrkv.ch/things/raphae-el-system-demo/). (Desktop only).
 
 If you wanted to render the fractal plant (Example 7) on Wikipedia:
 <br/>
